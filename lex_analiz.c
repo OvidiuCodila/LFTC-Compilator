@@ -68,9 +68,14 @@ char *createString(char *startCh, char *endCh)
     {
         aux = *(++startCh);
         startCh--;
-        if((*startCh) == '\\' && !isalpha(aux)) startCh++;
-
-        result[index] = *startCh;
+		if((*startCh) == '\\')
+		{
+			if(aux == 't') result[index] = '\t';
+			if(aux == 'r') result[index] = '\r';
+			if(!isalpha(aux)) result[index] = aux;
+			startCh++;
+		}
+		else result[index] = *startCh;
         index++;
         startCh++;
     }
@@ -151,7 +156,7 @@ int getNextToken()
                 else if(n==6 && !memcmp(pStartCh,"double",6)) tk=addTk(DOUBLE);
                 else if(n==4 && !memcmp(pStartCh,"else",4)) tk=addTk(ELSE);
                 else if(n==3 && !memcmp(pStartCh,"for",3)) tk=addTk(FOR);
-                else if(n==2 && !memcmp(pStartCh,"if",3)) tk=addTk(IF);
+                else if(n==2 && !memcmp(pStartCh,"if",2)) tk=addTk(IF);
                 else if(n==3 && !memcmp(pStartCh,"int",3)) tk=addTk(INT);
                 else if(n==6 && !memcmp(pStartCh,"return",3)) tk=addTk(RETURN);
                 else if(n==6 && !memcmp(pStartCh,"struct",3)) tk=addTk(STRUCT);
@@ -255,7 +260,14 @@ int getNextToken()
             case 19: {
                 //CT_CHAR
                 tk=addTk(CT_CHAR);
-                tk->c = pStartCh[1];
+				if(pStartCh[1] == '\\')
+				{
+					if(!isalpha(pStartCh[2])) tk->c = pStartCh[2];
+					else if(pStartCh[2] == 't') tk->c = '\t';
+					else if(pStartCh[2] == 'r') tk->c = '\r';
+					else if(pStartCh[2] == 'n') tk->c = '\n';
+				}
+				else tk->c = pStartCh[1];
                 return CT_CHAR;
             }
             case 20: {
