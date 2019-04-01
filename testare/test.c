@@ -10,8 +10,8 @@ int main()
 	d = 5.3e-2;
 
 	temp3 = temp1 + temp2;
-	printf("trenul \"de aur\" merge cu %d km/h \n",temp1);
-	printf("a\\b = c");
+	//printf("trenul \"de aur\" merge cu %d km/h \n",temp1);
+	//printf("a\\b = c");
 
 	return temp3;
 }
