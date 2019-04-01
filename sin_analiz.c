@@ -649,9 +649,9 @@ int declStruct()
     return 0;
 }
 
-int unit(Token *tkn)
+int unit()
 {
-    crtTk = tkn;
+    crtTk = tokens;
     for(;;)
     {
         if(declStruct()) {}
