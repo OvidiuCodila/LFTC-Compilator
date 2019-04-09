@@ -25,7 +25,7 @@ int main(int argc, char **argv)
     pCrtCh = inBuf;
     while(getNextToken() != END) {}
     
-    afisare();
+    //afisare();
 
     if(unit(tokens))
         printf("Syntax OK\n");
