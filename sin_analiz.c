@@ -70,7 +70,6 @@ int exprAssign()
     if(exprOr()) return 1;
    
     crtTk = startTk;
-    //printf("#exprAssign() -> %s\n",convertAtomsName(crtTk->code));
     return 0;
 }
  
@@ -81,17 +80,21 @@ int exprPrimary()
  
     if(consume(ID))
     {
-        consume(LPAR);
-        expr();
-        for(;;)
-        {
+        if(consume(LPAR))
+    {
+      expr();
+      for(;;)
+      {
             if(consume(COMMA))
             {
                 if(expr()) {}
+                else tokenError(crtTk, "Missing expression after comma");
             }
             else break;
-        }
-        consume(RPAR);
+      }
+      if(consume(RPAR)) {}
+      else tokenError(crtTk, "Missing )");
+    }
         return 1;
     }
     if(consume(CT_INT)) return 1;
@@ -107,7 +110,6 @@ int exprPrimary()
     }
    
     crtTk = startTk;
-    //printf("#exprPrimary() -> %s\n",convertAtomsName(crtTk->code));
     return 0;
 }
  
@@ -135,7 +137,6 @@ int exprPostfixPrim()
     }
  
     crtTk = startTk;
-    //printf("#exprPostfixPrim() -> %s\n",convertAtomsName(crtTk->code));
     return 1;
 }
  
@@ -149,7 +150,6 @@ int exprPostfix()
             return 1;
  
     crtTk = startTk;
-    //printf("#exprPostfix() -> %s\n",convertAtomsName(crtTk->code));
     return 0;
 }
  
@@ -162,11 +162,11 @@ int exprUnary()
     {
         if(exprUnary())
             return 1;
+        else tokenError(crtTk, "Invalid expression after Unary operator");
     }
     if(exprPostfix()) return 1;
  
     crtTk = startTk;
-    //printf("#exprUnary() -> %s\n",convertAtomsName(crtTk->code));
     return 0;
 }
  
@@ -189,7 +189,6 @@ int exprCast()
     if(exprUnary()) return 1;
  
     crtTk = startTk;
-    //printf("#exprCast() -> %s\n",convertAtomsName(crtTk->code));
     return 0;
 }
  
@@ -200,11 +199,12 @@ int exprMulPrim()
  
     if(consume(MUL) || consume(DIV))
         if(exprCast())
+        {
             if(exprMulPrim())
                 return 1;
+        }else tokenError(crtTk, "Invalid expression after */ /");
    
     crtTk = startTk;
-    //printf("#exprMulPrim() -> %s\n",convertAtomsName(crtTk->code));
     return 1;
 }
  
@@ -218,7 +218,6 @@ int exprMul()
             return 1;
    
     crtTk = startTk;
-    //printf("#exprMul() -> %s\n",convertAtomsName(crtTk->code));
     return 0;
 }
  
@@ -229,11 +228,12 @@ int exprAddPrim()
  
     if(consume(ADD) || consume(SUB))
         if(exprMul())
+        {
             if(exprAddPrim())
                 return 1;
+        }else tokenError(crtTk, "Invalid expresion after +/-");
    
     crtTk = startTk;
-    //printf("#exprAddPrim() -> %s\n",convertAtomsName(crtTk->code));
     return 1;
 }
  
@@ -247,7 +247,6 @@ int exprAdd()
             return 1;
    
     crtTk = startTk;
-    //printf("#exprAdd() -> %s\n",convertAtomsName(crtTk->code));
     return 0;
 }
  
@@ -258,11 +257,12 @@ int exprRelPrim()
  
     if(consume(LESS) || consume(LESSEQ) || consume(GREATER) || consume(GREATEREQ))
         if(exprAdd())
+        {
             if(exprRelPrim())
                 return 1;
+        }else tokenError(crtTk, "Invalid expression after </<=/>/>=");
    
     crtTk = startTk;
-    //printf("#exprRelPrim() -> %s\n",convertAtomsName(crtTk->code));
     return 1;
 }
  
@@ -276,7 +276,6 @@ int exprRel()
             return 1;
    
     crtTk = startTk;
-    //printf("#exprRel() -> %s\n",convertAtomsName(crtTk->code));
     return 0;
 }
  
@@ -287,11 +286,12 @@ int exprOrPrim()
  
     if(consume(OR))
         if(exprAnd())
+        {
             if(exprOrPrim())
                 return 1;
+        }else tokenError(crtTk, "Invalid expression after OR operator");
    
     crtTk = startTk;
-    //printf("#exprOrPrim() -> %s\n",convertAtomsName(crtTk->code));
     return 1;
 }
  
@@ -305,7 +305,6 @@ int exprOr()
             return 1;
    
     crtTk = startTk;
-    //printf("#exprOr() -> %s\n",convertAtomsName(crtTk->code));
     return 0;
 }
  
@@ -316,11 +315,12 @@ int exprEqPrim()
  
     if(consume(EQUAL) || consume(NOTEQ))
         if(exprRel())
+        {
             if(exprEqPrim())
                 return 1;
+        } else tokenError(crtTk, "Invalid expression after =/!=");
    
     crtTk = startTk;
-    //printf("#exprEqPrim() -> %s\n",convertAtomsName(crtTk->code));
     return 1;
 }
  
@@ -334,7 +334,6 @@ int exprEq()
             return 1;
    
     crtTk = startTk;
-    //printf("#exprEq() -> %s\n",convertAtomsName(crtTk->code));
     return 0;
 }
  
@@ -345,11 +344,12 @@ int exprAndPrim()
  
     if(consume(AND))
         if(exprEq())
+        {
             if(exprAndPrim())
                 return 1;
+        } else tokenError(crtTk, "Invalid expression after AND operator");
  
     crtTk = startTk;
-    //printf("#exprAndPrim() -> %s\n",convertAtomsName(crtTk->code));
     return 1;
 }
  
@@ -363,7 +363,6 @@ int exprAnd()
             return 1;
  
     crtTk = startTk;
-    //printf("#exprAnd() -> %s\n",convertAtomsName(crtTk->code));
     return 0;
 }
  
@@ -373,7 +372,7 @@ int stm()
     printf("#stm() -> %s\n",convertAtomsName(crtTk->code));
  
     if(stmCompund()) return 1;
-    if(consume(IF))
+    else if(consume(IF))
     {
         if(consume(LPAR))
         {
@@ -387,11 +386,11 @@ int stm()
                             if(!stm()) tokenError(crtTk,"Missing else statement");
                         return 1;
                     }else tokenError(crtTk, "Missing action after if statement");
-                }else tokenError(crtTk, "Missing ) after if statement");
+                }else tokenError(crtTk, "Invalid IF condition or Missing ) after if statement");
             }else tokenError(crtTk, "Missing expression inside if statement");
         }else tokenError(crtTk, "Missing ( after IF statement");
     }
-    if(consume(WHILE))
+    else if(consume(WHILE))
     {
         if(consume(LPAR))
         {
@@ -406,7 +405,7 @@ int stm()
             }else tokenError(crtTk, "Missing expression inside while statement");
         }else tokenError(crtTk, "Missing ( after while statement");
     }
-    if(consume(FOR))
+    else if(consume(FOR))
     {
         if(consume(LPAR))
         {
@@ -427,28 +426,27 @@ int stm()
             }else tokenError(crtTk, "Missing ; in for statement");
         }else tokenError(crtTk, "Missing ( after for statement");
     }
-    if(consume(BREAK))
+    else if(consume(BREAK))
     {
         if(consume(SEMICOLON))
             return 1;
         else tokenError(crtTk, "Missing ; after break statement");
     }
-    if(consume(RETURN))
+    else if(consume(RETURN))
     {
         expr();
         if(consume(SEMICOLON))
             return 1;
         else tokenError(crtTk, "Missing ; after return statement");
     }
-    if(expr())
+    else
     {
+        expr();
         if(consume(SEMICOLON))
             return 1;
-        else tokenError(crtTk, "Missing ; at the end of expression");
     }
  
     crtTk = startTk;
-    //printf("#stm() -> %s\n",convertAtomsName(crtTk->code));
     return 0;
 }
  
@@ -471,7 +469,6 @@ int stmCompund()
     }
  
     crtTk = startTk;
-    //printf("#stmCompund() -> %s\n",convertAtomsName(crtTk->code));
     return 0;
 }
  
@@ -483,7 +480,6 @@ int expr()
     if(exprAssign()) return 1;
    
     crtTk = startTk;
-    //printf("#expr() -> %s\n",convertAtomsName(crtTk->code));
     return 0;
 }
  
@@ -502,7 +498,6 @@ int typeBase()
     }
  
     crtTk = startTk;
-    //printf("#typeBase() -> %s\n",convertAtomsName(crtTk->code));
     return 0;
 }
  
@@ -520,7 +515,6 @@ int arrayDecl()
     }
  
     crtTk = startTk;
-    //printf("#arrayDecl() -> %s\n",convertAtomsName(crtTk->code));
     return 0;
 }
  
@@ -536,7 +530,6 @@ int typeName()
     }
  
     crtTk = startTk;
-    //printf("#typeName() -> %s\n",convertAtomsName(crtTk->code));
     return 0;
 }
  
@@ -553,21 +546,22 @@ int funcArg()
         }else tokenError(crtTk, "Missing variable name");
  
     crtTk = startTk;
-    //printf("#funcArg() -> %s\n",convertAtomsName(crtTk->code));
     return 0;
 }
  
 int declFunc()
 {
     Token *startTk = crtTk;
+    int foundType = 0;
     printf("#declFunc() -> %s\n",convertAtomsName(crtTk->code));
  
     if(typeBase())
     {
         consume(MUL);
+        foundType = 1;
     }
-    else if(consume(VOID)) {}
-    else { crtTk = startTk;  return 0; }
+    else if(consume(VOID)) { foundType = 1; }
+    else { crtTk = startTk; return 0; }
  
     if(consume(ID))
     {
@@ -579,6 +573,7 @@ int declFunc()
                 if(consume(COMMA))
                 {
                     if(funcArg()) {}
+                    else tokenError(crtTk, "Missing argument after comma");
                 }
                 else break;
             }
@@ -588,7 +583,7 @@ int declFunc()
                     return 1;
                 else tokenError(crtTk, "Invalid function declaration");
             }else tokenError(crtTk, "Missing ) in function declaration");
-        }//else tokenError(crtTk, "Missing ( in function declaration");
+        }
     }else tokenError(crtTk, "Missing function ID");
  
     crtTk = startTk;
@@ -627,7 +622,6 @@ int declVar()
  
 int declStruct()
 {
-    //!!!!! struct ID { var }; struct ID x; struct ID func() {} !!!!!!!
     Token *startTk = crtTk;
     printf("#declStruct() -> %s\n",convertAtomsName(crtTk->code));
  
@@ -647,8 +641,8 @@ int declStruct()
                         return 1;
                     else tokenError(crtTk,"Missing ; at the end of line");
                 }else tokenError(crtTk,"Mising } at the end of statement");
-            }//else tokenError(crtTk,"Missing { at the begining of statement");
-        }//else tokenError(crtTk,"Missing structure id");
+            }
+        }
  
     crtTk = startTk;
     return 0;

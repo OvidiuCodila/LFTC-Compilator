@@ -1,7 +1,7 @@
 #define true 1
 #define SAFEALLOC(var,Type) if((var=(Type*)malloc(sizeof(Type)))==NULL)error("not enough memory");
-
-
+ 
+ 
 typedef struct _Token{
     int code;
     union{
@@ -11,26 +11,27 @@ typedef struct _Token{
     };
     int line;
     struct _Token *next;
+    struct _Token *prev;
 }Token;
-
-
+ 
+ 
 enum Atoms{END, ID, CT_INT, CT_REAL, CT_STRING, CT_CHAR, COMMA, SEMICOLON, LPAR, RPAR,
         LBRACKET, RBRACKET, LACC, RACC, ADD, SUB, MUL, DIV, DOT, AND, OR, NOT,
-        ASSIGN, EQUAL, NOTEQ, LESS, LESSEQ, GREATER, GREATEREQ, BREAK, CHAR, DOUBLE, 
+        ASSIGN, EQUAL, NOTEQ, LESS, LESSEQ, GREATER, GREATEREQ, BREAK, CHAR, DOUBLE,
         ELSE, FOR, IF, INT, RETURN, STRUCT, VOID, WHILE};
-
+ 
 char *pCrtCh;
 int line;
 Token *tokens, *lastToken;
-
-
+ 
+ 
 void error(char *msj)
 {
     printf(msj);
     printf("\n");
     exit(-1);
 }
-
+ 
 void tokenError(Token *tk, char *msj)
 {
     printf("Error! on line %d: ",tk->line);
@@ -38,7 +39,7 @@ void tokenError(Token *tk, char *msj)
     printf("\n");
     exit(-1);
 }
-
+ 
 char *convertAtomsName(int code)
 {
     switch(code)
